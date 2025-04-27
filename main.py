@@ -1,10 +1,11 @@
-import streamlit as st
-import pandas as pd
 import numpy as np
+import pandas as pd
 import plotly.graph_objects as go
+import streamlit as st
 from scipy.stats import f as f_dist
 
 from utils.dispersion_analysis import get_groups_from_df, perform_dispers_analysis
+from utils.dynamic_programming import compute_replacement_plan, extract_rs_from_df
 from utils.risk_analysis import build_risk_matrix, calculate_danger
 
 # Настройка страницы
@@ -26,7 +27,7 @@ with tab1:
     )
     if uploaded_file1 is not None:
         try:
-            df1 = pd.read_excel(uploaded_file1)
+            df1: pd.DataFrame = pd.read_excel(uploaded_file1)
             st.dataframe(df1)
 
             # Подготовка данных и расчет dispers
@@ -151,12 +152,12 @@ with tab2:
     )
     if uploaded_file2 is not None:
         try:
-            df2 = pd.read_excel(uploaded_file2)
+            df2: pd.DataFrame = pd.read_excel(uploaded_file2)
             st.subheader("Исходные данные")
             st.dataframe(df2)
 
             # Вычисление уровня опасности
-            df2_danger = calculate_danger(df2)
+            df2_danger: pd.DataFrame = calculate_danger(df2)
             st.subheader("Данные с уровнем опасности")
             st.dataframe(df2_danger)
 
@@ -176,11 +177,41 @@ with tab3:
     uploaded_file3 = st.file_uploader(
         "Загрузите Excel файл для динамического программирования",
         type=["xlsx", "xls"],
-        key="upload_dp",
+        key="upload_dp"
     )
     if uploaded_file3 is not None:
         try:
-            df3 = pd.read_excel(uploaded_file3)
+            df3: pd.DataFrame = pd.read_excel(uploaded_file3, header=None)
+            st.subheader("Исходные данные (две строки: прибыль r(t) и остаточная стоимость s(t))")
             st.dataframe(df3)
+
+            # Извлечение r и s
+            r, s = extract_rs_from_df(df3)
+
+            # Ввод параметров
+            st.subheader("Параметры модели:")
+            P = st.number_input("Стоимость нового оборудования (P)", value=7.0, min_value=0.0)
+            t0 = st.number_input(
+                "Начальный возраст оборудования (t0)",
+                value=1,
+                min_value=0,
+                max_value=len(r)-1,
+                step=1
+            )
+            if st.button("Рассчитать план", key="calc_dp"):
+                try:
+                    result_dp = compute_replacement_plan(r, s, P, t0)
+                    st.subheader("Максимальная прибыль")
+                    st.write(f"**{result_dp['total_profit']:.2f}**")
+
+                    st.subheader("Оптимальный план замены оборудования")
+                    df_plan = pd.DataFrame(result_dp['plan'])
+                    st.table(df_plan)
+
+                    # st.subheader("Таблица Беллмана (F)")
+                    # df_F = pd.DataFrame(result_dp['F'])
+                    # st.dataframe(df_F)
+                except Exception as e:
+                    st.error(f"Ошибка при расчете: {e}")
         except Exception as e:
-            st.error(f"Ошибка при чтении файла: {e}")
+            st.error(f"Ошибка при обработке файла: {e}")

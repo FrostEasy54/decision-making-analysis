@@ -17,7 +17,7 @@ def calculate_danger(df: pd.DataFrame) -> pd.DataFrame:
     df["Вероятность"] = pd.to_numeric(df["Вероятность"], errors="coerce")
     # Убираем название
     df = df.drop("Название риска", axis=1)
-    # Вычисляем Danger
+    # Вычисляем Опасность
     df["Опасность"] = df.apply(
         lambda row: row["Ущерб"] * row["Вероятность"]
         if 1 <= row["Ущерб"] <= 10 and 1 <= row["Вероятность"] <= 10
