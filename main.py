@@ -118,6 +118,13 @@ with tab1:
                     annotation_text="F-статистика",
                     annotation_position="top right",
                 )
+                fig.add_vline(
+                    x=result["F_crit"],
+                    line=dict(dash="dash"),
+                    annotation_text=f"F критическое (α={result['alpha']}) ≈ {result['F_crit']:.2f}",
+                    annotation_position="top left",
+                    annotation_font_color="blue",
+                )
                 fig.add_trace(
                     go.Scatter(
                         x=[f_value],

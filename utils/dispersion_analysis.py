@@ -57,6 +57,9 @@ def perform_dispers_analysis(data: list[list[float]]) -> dict:
     F_stat = MS_between / MS_within
     p_value = 1 - f.cdf(F_stat, df_between, df_within)
 
+    alpha = 0.05
+    F_crit = f.ppf(1 - alpha, df_between, df_within)
+
     return {
         'SS_total': SS_total,
         'SS_between': SS_between,
@@ -73,5 +76,7 @@ def perform_dispers_analysis(data: list[list[float]]) -> dict:
         'total_mean': total_mean,
         'k': k,
         'n_list': n_list,
-        'N': N
+        'N': N,
+        'F_crit': F_crit,
+        'alpha': alpha,
     }
