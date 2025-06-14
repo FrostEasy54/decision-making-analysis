@@ -190,9 +190,9 @@ with tab3:
 
             # Ввод параметров
             st.subheader("Параметры модели:")
-            P = st.number_input("Стоимость нового оборудования (P)", value=7.0, min_value=0.0)
+            P = st.number_input("Стоимость перехода на новое графическое ядро (P)", value=7.0, min_value=0.0)
             t0 = st.number_input(
-                "Начальный возраст оборудования (t0)",
+                "Начальный возраст графического ядра (t0)",
                 value=1,
                 min_value=0,
                 max_value=len(r)-1,
@@ -204,7 +204,7 @@ with tab3:
                     st.subheader("Максимальная прибыль")
                     st.write(f"**{result_dp['total_profit']:.2f}**")
 
-                    st.subheader("Оптимальный план замены оборудования")
+                    st.subheader("Оптимальный план замены графического ядра")
                     df_plan = pd.DataFrame(result_dp['plan'])
                     st.table(df_plan)
 
